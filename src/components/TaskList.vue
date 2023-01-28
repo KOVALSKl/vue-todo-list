@@ -1,11 +1,6 @@
-<script>
+<script setup>
 import TaskVue from "./Task.vue";
 import { ref, watch, onMounted } from "vue";
-export default {
-  components: {
-    TaskVue: TaskVue,
-  },
-  setup() {
     let tasks = ref([]);
 
     let sortedTasks = ref([]);
@@ -87,18 +82,6 @@ export default {
         finished: false,
       });
     }
-
-    return {
-      onTaskUpdate,
-      onTaskStatusUpdate,
-      onTaskDelete,
-      addNewTask,
-      tasks,
-      sortBy,
-      sortedTasks,
-    };
-  },
-};
 </script>
 
 <template>
