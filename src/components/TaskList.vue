@@ -10,6 +10,8 @@ export default {
 
     let sortedTasks = ref([]);
 
+    // вместо этой штуки лучше было бы использовать enum, если бы я конечно же
+    // использовал typescript
     let sortBy = ref("all");
 
     onMounted(() => {
@@ -19,7 +21,7 @@ export default {
     });
 
     watch(sortBy, (sortType) => {
-      sortTasks(sortType);
+      sortedTasks.value = sortTasks(tasks.value, sortType);
     });
 
     watch(
@@ -31,27 +33,23 @@ export default {
             ...newValue.map((item) => JSON.parse(JSON.stringify(item))),
           ])
         );
-        sortedTasks.value = [...newValue];
+        sortedTasks.value = sortTasks([...newValue], sortBy.value);
       },
       {
         deep: true,
       }
     );
 
-    function sortTasks(sortType) {
+    function sortTasks(tasks, sortType) {
       switch (sortType) {
         case "all": {
-          return (sortedTasks.value = tasks.value);
+          return tasks;
         }
         case "finished": {
-          return (sortedTasks.value = tasks.value.filter(
-            (item) => item.finished
-          ));
+          return tasks.filter((item) => item.finished);
         }
         case "active": {
-          return (sortedTasks.value = tasks.value.filter(
-            (item) => !item.finished
-          ));
+          return tasks.filter((item) => !item.finished);
         }
       }
     }
@@ -80,7 +78,8 @@ export default {
     }
 
     function addNewTask() {
-      tasks.value.push({
+      sortBy.value = "all";
+      tasks.value.unshift({
         id: new Date().getTime(),
         title: "",
         body: "",
@@ -103,12 +102,15 @@ export default {
 </script>
 
 <template>
-  <select class="sort-by-list" v-model="sortBy">
-    <option value="all">all</option>
-    <option value="finished">finished</option>
-    <option value="active">in progress</option>
-  </select>
-  <ul class="tasks-list" v-if="tasks.length > 0">
+  <div class="tasks-sort-status">
+    <label for="sort-by-status-select">Сортировка задач по статусу:</label>
+    <select class="sort-by-list" v-model="sortBy" id="sort-by-status-select">
+      <option value="all">все</option>
+      <option value="finished">выполненые</option>
+      <option value="active">активные</option>
+    </select>
+  </div>
+  <ul class="tasks-list" v-if="sortedTasks.length > 0">
     <li
       class="task-list__item-container"
       v-for="task in sortedTasks"
@@ -131,6 +133,11 @@ export default {
 </template>
 
 <style>
+.tasks-sort-status {
+  display: flex;
+  align-items: center;
+}
+
 ul.tasks-list {
   display: flex;
   flex-direction: column;

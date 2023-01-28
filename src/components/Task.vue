@@ -10,7 +10,7 @@ const taskData = ref({
   finished: props.task.task.finished,
 });
 
-let isEditing = ref(true);
+let isEditing = ref(!checkTaskFields());
 
 const editButtonText = computed(() => {
   return isEditing.value ? "Save" : "Edit";
@@ -33,7 +33,7 @@ function setIsEditing() {
 }
 
 function checkTaskFields() {
-  return taskData.value.title && taskData.value.date && taskData.value.body;
+  return taskData.value.title && taskData.value.body;
 }
 
 // EMIT'ы событий
